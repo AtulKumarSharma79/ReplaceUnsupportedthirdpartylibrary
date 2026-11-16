@@ -22,10 +22,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     runtimeOnly 'com.h2database:h2'
 
-    // Third-party libraries used for business features (see the problem statement).
-    implementation 'joda-time:joda-time:2.1'
-    implementation 'log4j:log4j:1.2.17'
-    implementation 'net.sf.opencsv:opencsv:2.3'
+    // Replacement libraries (see the problem statement for migration details).
+    // Joda-Time replaced with java.time (JDK built-in).
+    // log4j 1.x replaced with SLF4J + Logback (included with spring-boot-starter-web).
+    implementation 'com.opencsv:opencsv:5.9'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
