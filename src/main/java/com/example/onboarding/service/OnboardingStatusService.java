@@ -19,9 +19,9 @@ public class OnboardingStatusService {
 
     public OnboardingStatus statusFor(Employee employee, java.time.LocalDate today) {
         LocalDate start = employee.getOnboardingDate();
-        LocalDate now = LocalDate.now();
+        LocalDate now = today;
 
-        int days = (int)ChronoUnit.DAYS.between(start, now);
+        int days = (int)ChronoUnit.DAYS.between(now, start);
         String status = days > 0 ? "UPCOMING" : (days == 0 ? "STARTS_TODAY" : "STARTED");
 
         // Working days (Monday to Friday) after today, up to and including the onboarding date.
