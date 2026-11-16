@@ -1,6 +1,7 @@
 package com.example.onboarding.service;
 
-import au.com.bytecode.opencsv.CSVWriter;
+import com.opencsv.CSVWriterBuilder;
+import com.opencsv.ICSVWriter;
 import com.example.onboarding.model.Employee;
 import org.springframework.stereotype.Component;
 
@@ -16,18 +17,36 @@ public class EmployeeCsvExporter {
 
     public String export(List<Employee> employees) {
         StringWriter out = new StringWriter();
-        CSVWriter writer = new CSVWriter(out);
-        try {
-            writer.writeNext(new String[] {"id", "name", "role", "onboardingDate"});
+
+        try (ICSVWriter writer = new CSVWriterBuilder(out)
+                .withSeparator(',')
+                .withQuoteChar('"')
+                .withEscapeChar('"')
+                .withLineEnd("\n")
+                .build()) {
+
+            writer.writeNext(
+                    new String[]{"id", "name", "role", "onboardingDate"},
+                    true
+            );
+
             for (Employee e : employees) {
-                writer.writeNext(new String[] {
-                        String.valueOf(e.getId()), e.getName(), e.getRole(), String.valueOf(e.getOnboardingDate())
-                });
+                writer.writeNext(
+                        new String[]{
+                                String.valueOf(e.getId()),
+                                e.getName(),
+                                e.getRole(),
+                                String.valueOf(e.getOnboardingDate())
+                        },
+                        true
+                );
             }
-            writer.close();
+
         } catch (IOException ex) {
             throw new IllegalStateException("Could not write CSV", ex);
         }
+
         return out.toString();
+    
     }
 }
