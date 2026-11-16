@@ -5,8 +5,15 @@ import com.example.onboarding.model.Employee;
 import com.example.onboarding.repository.EmployeeRepository;
 import com.example.onboarding.service.EmployeeCsvExporter;
 import com.example.onboarding.service.OnboardingStatusService;
+
 import jakarta.validation.Valid;
-import org.apache.log4j.Logger;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -14,14 +21,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDate;
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/employees")
 public class EmployeeController {
 
-    private static final Logger log = Logger.getLogger(EmployeeController.class);
+    private static final Logger log = LoggerFactory.getLogger(EmployeeController.class);
 
     private final EmployeeRepository repository;
     private final OnboardingStatusService statusService;

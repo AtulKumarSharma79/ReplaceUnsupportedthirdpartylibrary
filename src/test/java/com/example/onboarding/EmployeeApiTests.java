@@ -129,4 +129,21 @@ class EmployeeApiTests {
         String id = create("Asha Rao", "Engineer", "2026-11-10");
         assertThat(output.getAll()).contains("Employee created: id=" + id);
     }
+
+    @Test 
+    void creatingAnEmployeeWithDoubleQuotesInNameIsLogged(CapturedOutput output) throws Exception {
+        String id = create("Aoife O\\\"Neil", "TPM", "2026-10-05");
+        assertThat(output.getAll()).contains("Employee created: id=" + id);
+    }
+
+    @Test 
+    void exportsCsvWithDoubleQuotesInName(CapturedOutput output) throws Exception {
+        create("Aoife O\\\"Neil", "TPM", "2026-10-05");
+        String csv = mvc.perform(get("/api/employees/export"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith("text/csv"))
+                .andReturn().getResponse().getContentAsString();
+        assertThat(csv).matches("(?s)\"id\",\"name\",\"role\",\"onboardingDate\"\n"
+                + "\"\\d+\",\"Aoife O\"\"Neil\",\"TPM\",\"2026-10-05\"\n");
+    }
 }
