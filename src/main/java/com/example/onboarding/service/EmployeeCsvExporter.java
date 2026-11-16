@@ -1,6 +1,5 @@
 package com.example.onboarding.service;
-
-import au.com.bytecode.opencsv.CSVWriter;
+import com.opencsv.CSVWriter;
 import com.example.onboarding.model.Employee;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +15,13 @@ public class EmployeeCsvExporter {
 
     public String export(List<Employee> employees) {
         StringWriter out = new StringWriter();
-        CSVWriter writer = new CSVWriter(out);
+        CSVWriter writer = new CSVWriter(
+        out,
+        CSVWriter.DEFAULT_SEPARATOR,
+        CSVWriter.DEFAULT_QUOTE_CHARACTER,
+        CSVWriter.DEFAULT_ESCAPE_CHARACTER,
+        "\n"
+        );
         try {
             writer.writeNext(new String[] {"id", "name", "role", "onboardingDate"});
             for (Employee e : employees) {
