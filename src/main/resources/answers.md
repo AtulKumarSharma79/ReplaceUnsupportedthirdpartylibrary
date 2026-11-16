@@ -376,15 +376,6 @@ Installed via `brew install trivy`
 `trivy fs ~/Documents/citi-java-workshop/javaworkshops/exercise-4/ReplaceUnsupportedthirdpartylibrary --list-all-pkgs`
 
 ```        
-2026-11-16T12:05:43Z    WARN    "--list-all-pkgs" is only valid for the JSON format, for other formats a list of packages is automatically included.
-2026-11-16T12:05:43Z    INFO    [vuln] Vulnerability scanning is enabled
-2026-11-16T12:05:43Z    INFO    [secret] Secret scanning is enabled
-2026-11-16T12:05:43Z    INFO    [secret] If your scanning is slow, please try '--scanners vuln' to disable secret scanning
-2026-11-16T12:05:43Z    INFO    [secret] Please see https://trivy.dev/docs/v0.76/guide/scanner/secret#recommendation for faster secret detection
-2026-11-16T12:05:47Z    INFO    Suppressing dependencies for development and testing. To display them, try the '--include-dev-deps' flag.
-2026-11-16T12:05:47Z    INFO    Number of language-specific files       num=1
-2026-11-16T12:05:47Z    INFO    [gradle] Detecting vulnerabilities...
-
 Report Summary
 
 ┌─────────────────┬────────┬─────────────────┬─────────┐
@@ -684,15 +675,6 @@ Created a clone in a seperate adjacent directory of the original source:
 `trivy fs ~/Documents/citi-java-workshop/javaworkshops/exercise-4.1/ReplaceUnsupportedthirdpartylibrary --list-all-pkgs`
 
 ```
-2026-11-16T12:08:31Z	WARN	"--list-all-pkgs" is only valid for the JSON format, for other formats a list of packages is automatically included.
-2026-11-16T12:08:31Z	INFO	[vuln] Vulnerability scanning is enabled
-2026-11-16T12:08:31Z	INFO	[secret] Secret scanning is enabled
-2026-11-16T12:08:31Z	INFO	[secret] If your scanning is slow, please try '--scanners vuln' to disable secret scanning
-2026-11-16T12:08:31Z	INFO	[secret] Please see https://trivy.dev/docs/v0.76/guide/scanner/secret#recommendation for faster secret detection
-2026-11-16T12:08:34Z	INFO	Suppressing dependencies for development and testing. To display them, try the '--include-dev-deps' flag.
-2026-11-16T12:08:34Z	INFO	Number of language-specific files	num=1
-2026-11-16T12:08:34Z	INFO	[gradle] Detecting vulnerabilities...
-
 Report Summary
 
 ┌─────────────────┬────────┬─────────────────┬─────────┐
@@ -1053,6 +1035,18 @@ void exportsCsvWithDoubleQuotesInName(CapturedOutput output) throws Exception {
 
 Both tests pass and match this expected behaviour of rendering a double quote with escaping it
 
-## S5: Change Steps and Notes
+## S5: Library replacement checklist
 
-- [ ] 
+1. Validate the status of your libraries by:
+  a. Looking up on your libraries through the Maven and Gradle repositories and seeing if any vulnarabilites are noted
+  b. Using a dependency checking tool such as OWASP Dependency-Check or Trivy to validate against CVE databases what needs replacing
+2. See if any libraries need replacing rather then upgrading, or are hosted differently on the repositories, and note those down
+3. Ensure you have adequate testing in place to check the functionality pre-remediation and post-remediation
+4. One by one, for each library that needs replacing, do the following:
+  a. Update its dependency in `build.gradle` or `pom.xml` to the new version or library
+  b. Locate all references to it in the code base
+  c. Update all import statements to point to the new library version
+  d. Update the main body of each file where required to comply with any functional changes from the new version or library
+  e. Execute your test suite
+  f. Commit your changes to your version control system
+5. Publish your branch with your fixes once all tests past after the last library remediation
