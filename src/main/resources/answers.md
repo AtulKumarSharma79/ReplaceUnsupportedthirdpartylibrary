@@ -38,7 +38,7 @@
 "1","Asha Rao","Engineer","2026-11-10"
 ```
 
-## Audit Table (for Core Task 1)
+## C1: Audit Table
 
 | Library | Declared in | Used in | Version release date (year) | Project status | Replacement | LTS support for current version? |
 |---|---|---|---|---|---|---|
@@ -46,7 +46,7 @@
 | log4j 1.2.17 | `build.gradle` | `.../controller/EmployeeController.java`,  | 2012 | Active (Relocated on MVN repos) | SLF4J API with Logback | No (last support for 1.x was 2015) |
 | opencsv 2.3 | `build.gradle` | `.../service/EmployeeCsvExporter.java` | 2011 | Active (Relocated on MVN repos) | opencsv 5.x (`com.opencsv`) | No (not even mentioned on upgrade support notes on the official website) |
 
-## Dependecy Graph Output and grep Results (for Core Task 6)
+## C6: Dependecy Graph Output and grep Results
 
 ### Dependecy graph
 
@@ -196,9 +196,7 @@
 \--- com.h2database:h2 -> 2.3.232
 ```
 
-`grep -rE "org.joda|org.apache.log4j|au.com.bytecode" src`
-
-Returns no results
+`grep -rE "org.joda|org.apache.log4j|au.com.bytecode" src` returns no results
 
 ### joda-time
 
@@ -210,6 +208,8 @@ No dependencies matching given input were found in configuration ':runtimeClassp
 ```
 
 ### log4j
+
+`./gradlew dependencyInsight --dependency log4j:log4j --configuration runtimeClasspath`    
 
 ```
 > Task :dependencyInsight
@@ -267,7 +267,7 @@ org.apache.logging.log4j:log4j-to-slf4j:2.24.3
                \--- org.springframework.boot:spring-boot-starter-data-jpa:3.5.7 (*)
 ```
 
-
+`./gradlew dependencyInsight --dependency log4j:log4j --configuration runtimeClasspath | grep -i "1.2.17"` returns no results  
 
 ### net.sf.opencsv
 
@@ -278,4 +278,95 @@ org.apache.logging.log4j:log4j-to-slf4j:2.24.3
 No dependencies matching given input were found in configuration ':runtimeClasspath'
 ```
 
-## Change Steps and Notes (for Core Task)
+## S1: Compare CSV Library Code Changes
+
+### Original (OpenCSV 2.3)
+
+```java
+import au.com.bytecode.opencsv.CSVWriter;
+
+@Component
+public class EmployeeCsvExporter {
+
+    public String export(List<Employee> employees) {
+        StringWriter out = new StringWriter();
+        CSVWriter writer = new CSVWriter(out);
+        try {
+            writer.writeNext(new String[] {"id", "name", "role", "onboardingDate"});
+            for (Employee e : employees) {
+                writer.writeNext(new String[] {
+                        String.valueOf(e.getId()), e.getName(), e.getRole(), String.valueOf(e.getOnboardingDate())
+                });
+            }
+            writer.close();
+        } catch (IOException ex) {
+            throw new IllegalStateException("Could not write CSV", ex);
+        }
+        return out.toString();
+    }
+}
+```
+
+### OpenCSV 5.12
+
+```java
+import com.opencsv.CSVWriter;
+
+@Component 
+EmployeeCsvExporter {
+    // no class changes required
+}
+```
+
+### Apache Commons CSV 1.14.1
+
+```java
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.QuoteMode;
+
+@Component
+public class EmployeeCsvExporter {
+    public String export(List<Employee> employees) {
+        StringWriter out = new StringWriter();
+        CSVFormat format = CSVFormat.DEFAULT.builder()
+            .setQuoteMode(QuoteMode.ALL)
+            .setRecordSeparator("\n")
+            .get();
+
+        try (CSVPrinter printer = new CSVPrinter(out, format)){
+            printer.printRecord("id", "name", "role", "onboardingDate");
+            for (Employee e : employees) {
+                printer.printRecord(
+                        String.valueOf(e.getId()),
+                        e.getName(),
+                        e.getRole(),
+                        String.valueOf(e.getOnboardingDate())
+                );
+            }
+            printer.close();
+        } catch (IOException ex) {
+            throw new IllegalStateException("Could not write CSV", ex);
+        }
+        return out.toString();
+    }
+}
+```
+
+Apache Commons CSV has many more imports and defaults to configure to match the old output, however its verbosity is also transparency in its behaviour which can be a positive trade off for how Java is designed.
+
+## S2: Old Libraries - Implicitly Imported
+
+` ./gradlew dependencies --configuration runtimeClasspath | grep -iE "log4j|joda-time|opencsv"`
+
+```
+|    |    |    +--- org.apache.logging.log4j:log4j-to-slf4j:2.24.3
+|    |    |    |    +--- org.apache.logging.log4j:log4j-api:2.24.3
++--- com.opencsv:opencsv:5.12.0
+```
+
+From the above dependency graph for Core Task 6, we can see that `org.springframework.boot:spring-boot-starter-logging` brings it in as a part of `org.springframework.boot:spring-boot-starter-web`, with it being used to convert from log4j to SLF4J by `org.apache.logging.log4j:log4j-to-slf4j`
+
+## S5: Change Steps and Notes
+
+- [ ] 
