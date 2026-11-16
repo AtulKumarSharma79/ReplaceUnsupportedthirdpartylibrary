@@ -16,7 +16,6 @@ import java.util.List;
  */
 @Component
 public class EmployeeCsvExporter {
-
     public String export(List<Employee> employees) {
         StringWriter out = new StringWriter();
         CSVFormat format = CSVFormat.DEFAULT.builder()
