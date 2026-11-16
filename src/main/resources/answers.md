@@ -1006,7 +1006,52 @@ Total: 69 (UNKNOWN: 0, LOW: 8, MEDIUM: 24, HIGH: 25, CRITICAL: 12)
 
 5 more vulnerabilities, 3 of them critical in nature, can be located in the original source
 
-## S4: Add a Test
+## S4: Add a Test - Double Quote in Name
+
+Created the following user and added it to the DB with Bruno:
+
+```json
+{
+  "name": "Aoife O\"Neil",
+  "role": "TPM",
+  "onboardingDate": "2026-10-05"
+}
+```
+
+Result from `GET http://localhost:8080/api/employees/export`:
+
+"id","name","role","onboardingDate"
+"1","Aoife O""Neil","TPM","2026-10-05"
+
+CSV plaintest includes `""` for where the double quote is. To escape a double quote in a CSV field value, you provided a second as the escape delimiter
+
+```csv
+"id","name","role","onboardingDate"
+"1","Aoife O""Neil","TPM","2026-10-05"
+```
+
+Added 2 tests to `src/test/java/com/example/onboarding/EmployeeApiTests.java`:
+
+```java
+@Test 
+void creatingAnEmployeeWithDoubleQuotesInNameIsLogged(CapturedOutput output) throws Exception {
+    String id = create("Aoife O\\\"Neil", "TPM", "2026-10-05");
+    assertThat(output.getAll()).contains("Employee created: id=" + id);
+}
+
+@Test 
+void exportsCsvWithDoubleQuotesInName(CapturedOutput output) throws Exception {
+    create("Aoife O\\\"Neil", "TPM", "2026-10-05");
+    String csv = mvc.perform(get("/api/employees/export"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith("text/csv"))
+            .andReturn().getResponse().getContentAsString();
+    assertThat(csv).matches("(?s)\"id\",\"name\",\"role\",\"onboardingDate\"\n"
+            + "\"\\d+\",\"Aoife O\"\"Neil\",\"TPM\",\"2026-10-05\"\n");
+}
+```
+
+Both tests pass and match this expected behaviour of rendering a double quote with escaping it
 
 ## S5: Change Steps and Notes
 
