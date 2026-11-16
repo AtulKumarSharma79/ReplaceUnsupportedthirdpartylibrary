@@ -28,6 +28,9 @@ dependencies {
     // Alternative libraries for CSV parsing
     implementation 'org.apache.commons:commons-csv:1.14.1'
 
+    // Dependency scanner for stretch task 3
+    runtimeOnly 'org.owasp:dependency-check-gradle:13.0.0'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
