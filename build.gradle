@@ -23,8 +23,11 @@ dependencies {
     runtimeOnly 'com.h2database:h2'
 
     // Third-party libraries used for business features (see the problem statement).
-    implementation 'log4j:log4j:1.2.17'
     implementation 'net.sf.opencsv:opencsv:2.3'
+
+    // Replacement third-party libraries
+    implementation 'org.slf4j:slf4j-api:2.0.20'
+    implementation 'ch.qos.logback:logback-classic:1.6.6'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
