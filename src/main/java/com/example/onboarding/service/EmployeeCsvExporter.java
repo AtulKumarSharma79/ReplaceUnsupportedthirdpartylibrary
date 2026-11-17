@@ -23,7 +23,7 @@ public class EmployeeCsvExporter {
             .setRecordSeparator("\n")
             .get();
 
-        try (CSVPrinter printer = new CSVPrinter(out, format)){
+        try (CSVPrinter printer = new CSVPrinter(out, format)) {
             printer.printRecord("id", "name", "role", "onboardingDate");
             for (Employee e : employees) {
                 printer.printRecord(
