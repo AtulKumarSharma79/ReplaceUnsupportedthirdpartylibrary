@@ -7,6 +7,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Locale;
 
 import org.springframework.stereotype.Service;
 
@@ -32,7 +33,9 @@ public class OnboardingStatusService {
             }
         }
 
-        String label = DateTimeFormatter.ofPattern("EEEE, dd MMMM yyyy").format(start);
+        String label = DateTimeFormatter.ofPattern("EEEE, dd MMMM yyyy")
+            .withLocale(Locale.ENGLISH)
+            .format(start);
 
         return new OnboardingStatus(employee.getId(), employee.getName(), employee.getOnboardingDate(),
                 label, days, workingDays, status);
